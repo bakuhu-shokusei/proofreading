@@ -1,0 +1,14 @@
+{
+  "name": "proofreading-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@google/clasp": "^2.4.2",
+    "@types/google-apps-script": "^1.0.89",
+    "typescript": "^5.7.2"
+  }
+}
