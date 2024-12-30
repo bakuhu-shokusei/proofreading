@@ -1,13 +1,33 @@
 <template>
   <Init v-if="currentPage === CurrentPage.Init" />
+  <div v-else class="basic-layout">
+    <Header />
+    <Search v-if="currentPage === CurrentPage.Search" />
+    <Proofreading v-if="currentPage === CurrentPage.Proofreading" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import Init from './components/init/Index.vue'
+import { storeToRefs } from 'pinia'
+import Init from './components/init/Init.vue'
+import Search from './components/search/Search.vue'
+import Proofreading from './components/proof-reading/Proofreading.vue'
+import Header from './components/shared/Header.vue'
 import { CurrentPage, useGlobalStore } from './store/global'
 
-const { currentPage } = useGlobalStore()
+const { currentPage } = storeToRefs(useGlobalStore())
 </script>
+
+<style lang="scss" scoped>
+.basic-layout {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  :deep(.full-height-content) {
+    flex: 1;
+  }
+}
+</style>
 
 <style>
 :root {

@@ -1,4 +1,5 @@
 import { get, set } from 'idb-keyval'
+import { useGlobalStore } from '../../store/global'
 
 function getDirectoryHandle() {
   return showDirectoryPicker({
@@ -13,7 +14,7 @@ interface ImageTextPair {
   text: FileSystemFileHandle
 }
 
-interface ProofreadingContent {
+export interface ProofreadingContent {
   [s: string]: ImageTextPair[]
 }
 
@@ -129,6 +130,8 @@ async function getContent(
       })
     })
   }
+
+  useGlobalStore().setProofReadingContent(content)
 
   return content
 }

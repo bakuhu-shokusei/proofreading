@@ -25,6 +25,9 @@
       </a-modal>
     </div>
   </div>
+  <div v-if="browserSupported && recoveredFromHistory === null" class="spin">
+    <a-spin size="large" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -73,7 +76,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 p {
   margin: 0;
 }
@@ -81,7 +84,6 @@ p {
   padding: 16px;
 }
 .file-system {
-  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -126,5 +128,12 @@ p {
     white-space: pre;
     color: var(--text-secondary);
   }
+}
+
+.spin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
 }
 </style>
