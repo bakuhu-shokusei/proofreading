@@ -19,7 +19,7 @@ import { CurrentPage, useGlobalStore, useProofreadingStore } from '../../store'
 
 const globalStore = useGlobalStore()
 const { currentPage, proofreadingContent } = storeToRefs(globalStore)
-const { updateCurrentPage } = useGlobalStore()
+const { updateCurrentPage } = globalStore
 
 const proofreadingStore = useProofreadingStore()
 const { initialize } = proofreadingStore
@@ -54,7 +54,7 @@ const onSelect: MenuProps['onSelect'] = ({ key }) => {
 
 const current = computed(() => {
   if (currentPage.value === CurrentPage.Proofreading)
-    return [proofreadingStore.book]
+    return [proofreadingStore.book as string]
   if (currentPage.value === CurrentPage.Search) return [CurrentPage.Search]
   return []
 })

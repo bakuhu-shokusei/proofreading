@@ -1,7 +1,156 @@
 <template>
-  <div class="full-height-content"></div>
+  <div class="search">
+    <div class="search-inner">
+      <InputSearch v-model:value="keyword" enter-button @search="onSearch" />
+
+      <div class="checkboxes">
+        <div
+          v-for="book in Object.keys(searchIn)"
+          :key="book"
+          class="check-book"
+        >
+          <Checkbox v-model:checked="searchIn[book]" />
+          <div class="book-name">{{ book }}</div>
+        </div>
+      </div>
+
+      <div v-if="loading" class="loading">
+        <Spin size="large" />
+      </div>
+
+      <div v-else class="results">
+        <div
+          v-for="book in Object.keys(searchResult)"
+          :key="book"
+          class="book-result"
+        >
+          <div class="book-name">{{ book }}</div>
+          <div class="result-count">
+            匹配结果
+            <b>{{ searchResult[book].length }}</b>
+            条
+          </div>
+
+          <Card
+            v-for="match in searchResult[book]"
+            :key="match.index"
+            :style="{ margin: '12px 0' }"
+            size="small"
+          >
+            <template #title>
+              <div class="card-title" @click="goToDetail(book, match.index)">
+                {{ match.textFileName }}
+              </div>
+            </template>
+            <div class="text-content">{{ match.textContent }}</div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Mark from 'mark.js'
+import { InputSearch, Checkbox, Spin, Card } from 'ant-design-vue'
+import {
+  useSearchStore,
+  useGlobalStore,
+  useProofreadingStore,
+  CurrentPage,
+} from '../../store'
+import { storeToRefs } from 'pinia'
+import { onUpdated } from 'vue'
 
-<style lang="scss" scoped></style>
+const searchStore = useSearchStore()
+const { search } = searchStore
+const { searchIn, keyword, loading, searchResult } = storeToRefs(searchStore)
+
+const globalStore = useGlobalStore()
+const { updateCurrentPage } = globalStore
+
+const proofreadingStore = useProofreadingStore()
+const { initialize } = proofreadingStore
+
+const onSearch = async (keyword: string) => {
+  if (!keyword) return
+  await search()
+}
+
+const highlightKeywords = () => {
+  const nodes = document.querySelectorAll<HTMLElement>(
+    '.book-result .text-content',
+  )
+  const instance = new Mark(nodes)
+  instance.mark(keyword.value)
+}
+onUpdated(highlightKeywords)
+
+const goToDetail = (book: string, index: number) => {
+  updateCurrentPage(CurrentPage.Proofreading)
+  initialize(book, index + 1)
+}
+</script>
+
+<style lang="scss" scoped>
+.search {
+  height: 100%;
+  overflow: auto;
+  .search-inner {
+    height: 100%;
+    padding: 16px 12px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    .checkboxes {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      .check-book {
+        display: flex;
+        align-items: center;
+        .book-name {
+          margin-left: 4px;
+        }
+      }
+    }
+    .loading {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .results {
+      border-bottom: 1px solid transparent;
+      .book-result {
+        font-family: var(--font-chinese);
+        margin: 32px 0;
+        .book-name {
+          color: var(--text-main);
+          font-size: 20px;
+          font-weight: 600;
+        }
+        .result-count {
+          color: var(--text-secondary);
+          font-size: 12px;
+          margin: 12px 0;
+        }
+        .card-title {
+          color: #1677ff;
+          cursor: pointer;
+        }
+        .text-content {
+          :deep(mark) {
+            padding: 0;
+            background-color: #ffd63f;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="full-height-content">
+  <div>
     <div v-if="!pageDetail.ready" class="loading">
       <Spin size="large" />
     </div>

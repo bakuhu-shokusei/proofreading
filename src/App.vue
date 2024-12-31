@@ -2,7 +2,7 @@
   <Init v-if="currentPage === CurrentPage.Init" />
   <div v-else class="basic-layout">
     <Header />
-    <Search v-if="currentPage === CurrentPage.Search" />
+    <Search v-show="currentPage === CurrentPage.Search" />
     <Proofreading v-if="currentPage === CurrentPage.Proofreading" />
   </div>
 </template>
