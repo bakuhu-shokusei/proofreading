@@ -29,6 +29,11 @@ export const useSearchStore = defineStore('Search', () => {
   const searchResult = ref<SearchResult>({})
 
   const search = async () => {
+    if (!keyword.value) {
+      searchResult.value = {}
+      return
+    }
+
     loading.value = true
     const books = Object.keys(searchIn.value).filter(
       (book) => searchIn.value[book],

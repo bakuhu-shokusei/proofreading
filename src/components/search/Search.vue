@@ -72,8 +72,7 @@ const { updateCurrentPage } = globalStore
 const proofreadingStore = useProofreadingStore()
 const { initialize } = proofreadingStore
 
-const onSearch = async (keyword: string) => {
-  if (!keyword) return
+const onSearch = async () => {
   await search()
 }
 
