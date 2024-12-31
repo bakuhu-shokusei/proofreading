@@ -15,11 +15,14 @@ import { SearchOutlined, FileImageOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
 import { Menu } from 'ant-design-vue'
 import type { MenuProps } from 'ant-design-vue'
-import { CurrentPage, useGlobalStore } from '../../store'
+import { CurrentPage, useGlobalStore, useProofreadingStore } from '../../store'
 
 const globalStore = useGlobalStore()
 const { currentPage, proofreadingContent } = storeToRefs(globalStore)
 const { updateCurrentPage } = useGlobalStore()
+
+const proofreadingStore = useProofreadingStore()
+const { initialize } = proofreadingStore
 
 const items = computed<MenuProps['items']>(() => {
   return [
@@ -27,16 +30,14 @@ const items = computed<MenuProps['items']>(() => {
       key: CurrentPage.Search,
       icon: () => h(SearchOutlined),
       label: '检索',
-      title: '检索',
     },
     {
       key: CurrentPage.Proofreading,
       icon: () => h(FileImageOutlined),
       label: '校对',
-      title: '校对',
       children: Object.keys(proofreadingContent.value || {}).map((i) => ({
+        key: i,
         label: i,
-        title: i,
       })),
     },
   ]
@@ -45,13 +46,15 @@ const items = computed<MenuProps['items']>(() => {
 const onSelect: MenuProps['onSelect'] = ({ key }) => {
   if (key === CurrentPage.Search) {
     updateCurrentPage(key)
+  } else {
+    updateCurrentPage(CurrentPage.Proofreading)
+    initialize(key as string)
   }
-  console.log(key)
 }
 
 const current = computed(() => {
   if (currentPage.value === CurrentPage.Proofreading)
-    return [CurrentPage.Proofreading]
+    return [proofreadingStore.book]
   if (currentPage.value === CurrentPage.Search) return [CurrentPage.Search]
   return []
 })

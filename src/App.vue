@@ -21,11 +21,9 @@ const { currentPage } = storeToRefs(useGlobalStore())
 <style lang="scss" scoped>
 .basic-layout {
   height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  :deep(.full-height-content) {
-    flex: 1;
-  }
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 </style>
 
