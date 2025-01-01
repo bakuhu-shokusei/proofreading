@@ -143,6 +143,7 @@ const goToDetail = (book: string, index: number) => {
           cursor: pointer;
         }
         .text-content {
+          font-family: var(--font-japanese);
           :deep(mark) {
             padding: 0;
             background-color: #ffd63f;

@@ -23,6 +23,7 @@ const { updateCurrentPage } = globalStore
 
 const proofreadingStore = useProofreadingStore()
 const { initialize } = proofreadingStore
+const { notSavedWarning, draftChanged } = storeToRefs(proofreadingStore)
 
 const items = computed<MenuProps['items']>(() => {
   return [
@@ -44,6 +45,10 @@ const items = computed<MenuProps['items']>(() => {
 })
 
 const onSelect: MenuProps['onSelect'] = ({ key }) => {
+  if (draftChanged.value) {
+    notSavedWarning.value = true
+    return
+  }
   if (key === CurrentPage.Search) {
     updateCurrentPage(key)
   } else {

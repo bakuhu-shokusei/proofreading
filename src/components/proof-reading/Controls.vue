@@ -18,8 +18,9 @@
     <Button type="primary" :disabled="!draftChanged" @click="saveChanges">
       保存修改
     </Button>
+
     <Modal
-      v-model:open="showConfirm"
+      v-model:open="notSavedWarning"
       title="请确认"
       :footer="null"
       :style="{ fontFamily: 'var(--font-chinese)' }"
@@ -32,22 +33,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Pagination, Button, Modal } from 'ant-design-vue'
 import { useProofreadingStore } from '../../store'
 import { storeToRefs } from 'pinia'
 
 const proofreadingStore = useProofreadingStore()
 const { updatePage, saveChanges, resetDraft } = proofreadingStore
-const { totalPages, page, draftChanged } = storeToRefs(proofreadingStore)
+const { totalPages, page, draftChanged, notSavedWarning } =
+  storeToRefs(proofreadingStore)
 
-const showConfirm = ref(false)
 const onPageChange = (page: number) => {
   if (!draftChanged.value) {
     updatePage(page)
     return
   } else {
-    showConfirm.value = true
+    notSavedWarning.value = true
   }
 }
 </script>

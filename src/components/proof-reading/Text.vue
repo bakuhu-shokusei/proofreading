@@ -48,6 +48,7 @@ h3 {
     flex: 1;
     resize: none;
     margin-bottom: 12px;
+    font-family: var(--font-japanese);
     &.is-vertical {
       writing-mode: vertical-rl;
     }
@@ -58,6 +59,7 @@ h3 {
     align-items: center;
     padding: 8px 0;
     .controls-text {
+      font-family: var(--font-japanese);
       color: var(--text-main);
       font-family: var(--font-chinese);
       font-size: 12px;

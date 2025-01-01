@@ -1,4 +1,4 @@
-import { get, set } from 'idb-keyval'
+import { get, set, del } from 'idb-keyval'
 import { useGlobalStore } from '../../store/global'
 
 function getDirectoryHandle() {
@@ -64,11 +64,16 @@ async function checkHistory(): Promise<FileSystemDirectoryHandle | null> {
   }
 }
 
-export async function getContentFromHistory() {
+export async function getContentFromHistory(): Promise<boolean> {
   const dirHandle = await checkHistory()
   if (dirHandle !== null) {
-    await getContent(dirHandle)
-    return true
+    try {
+      await getContent(dirHandle)
+      return true
+    } catch (e) {
+      await del(PROOFREADING_DIRECTORY)
+      throw e
+    }
   }
   return false
 }
@@ -113,7 +118,7 @@ async function getContent(
   }
   if (Object.keys(buf).length === 0) throw `未找到有效内容`
 
-  for (const [book, { image, text }] of Object.entries(buf)) {
+  for (const [book, { image = [], text = [] }] of Object.entries(buf)) {
     const pages = Array.from(
       new Set([...image.map((i) => i.key), ...text.map((i) => i.key)]),
     ).sort((a, b) => a - b)

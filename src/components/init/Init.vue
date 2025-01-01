@@ -71,8 +71,15 @@ const getDirectory = async () => {
 }
 
 onMounted(async () => {
-  const recovered = await getContentFromHistory()
-  recoveredFromHistory.value = recovered
+  try {
+    const recovered = await getContentFromHistory()
+    recoveredFromHistory.value = recovered
+  } catch (e) {
+    message.error(`${e}`)
+    setTimeout(() => {
+      location.reload()
+    }, 1000)
+  }
 })
 </script>
 

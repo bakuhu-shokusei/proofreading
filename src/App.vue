@@ -30,6 +30,8 @@ const { currentPage } = storeToRefs(useGlobalStore())
 <style>
 :root {
   --font-chinese: 'Arial', 'Microsoft YaHei', '黑体', '宋体', sans-serif;
+  --font-japanese: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN',
+    'Hiragino Sans', Meiryo, sans-serif;
   --text-main: rgba(0, 0, 0, 0.88);
   --text-secondary: rgba(0, 0, 0, 0.65);
 }

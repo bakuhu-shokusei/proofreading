@@ -16,6 +16,7 @@ export const useProofreadingStore = defineStore('Proofreading', () => {
     textContent: '',
     textContentCopy: '',
   })
+  const notSavedWarning = ref(false)
 
   const totalPages = computed(() => {
     if (!proofreadingContent || !book.value) return 0
@@ -76,5 +77,6 @@ export const useProofreadingStore = defineStore('Proofreading', () => {
     draftChanged,
     resetDraft,
     saveChanges,
+    notSavedWarning,
   }
 })
