@@ -6,6 +6,7 @@ export enum CurrentPage {
   Init,
   Search,
   Proofreading,
+  FileList,
 }
 
 export const useGlobalStore = defineStore('global', () => {

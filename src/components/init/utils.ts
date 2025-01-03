@@ -20,14 +20,8 @@ export interface ProofreadingContent {
 
 interface Buf {
   [s: string]: {
-    image: {
-      key: number
-      handle: FileSystemFileHandle
-    }[]
-    text: {
-      key: number
-      handle: FileSystemFileHandle
-    }[]
+    image: FileSystemFileHandle[]
+    text: FileSystemFileHandle[]
   }
 }
 
@@ -93,25 +87,23 @@ async function getContent(
           subFolder.kind === 'directory' &&
           (subName === SubFolder.Text || subName === SubFolder.Image)
         ) {
+          const files: FileSystemFileHandle[] = []
           for await (const file of subFolder.values()) {
             if (file.kind === 'file') {
-              const key = getFileKey(file.name, subName)
-              buf[name] = buf[name] || {}
-              if (subName === SubFolder.Text) {
-                buf[name].text = buf[name].text || []
-                buf[name].text.push({
-                  key,
-                  handle: file,
-                })
-              } else {
-                buf[name].image = buf[name].image || []
-                buf[name].image.push({
-                  key,
-                  handle: file,
-                })
-              }
+              files.push(file)
             }
           }
+          files.sort((a, b) => a.name.localeCompare(b.name))
+          files.forEach((file) => {
+            buf[name] = buf[name] || {}
+            if (subName === SubFolder.Text) {
+              buf[name].text = buf[name].text || []
+              buf[name].text.push(file)
+            } else {
+              buf[name].image = buf[name].image || []
+              buf[name].image.push(file)
+            }
+          })
         }
       }
     }
@@ -119,19 +111,20 @@ async function getContent(
   if (Object.keys(buf).length === 0) throw `未找到有效内容`
 
   for (const [book, { image = [], text = [] }] of Object.entries(buf)) {
-    const pages = Array.from(
-      new Set([...image.map((i) => i.key), ...text.map((i) => i.key)]),
-    ).sort((a, b) => a - b)
-    pages.forEach((page) => {
-      const img = image.find((i) => i.key === page)
-      const txt = text.find((i) => i.key === page)
-      if (!img) throw `找不到${page}页的图片`
-      if (!txt) throw `找不到${page}页的文字(txt文件)`
+    if (image.length !== text.length)
+      throw [
+        '页数不一致',
+        `图片：${image.length}页`,
+        `文字(txt文件)：${text.length}页`,
+      ].join('\n')
+    Array.from({ length: image.length }).forEach((_, idx) => {
+      const img = image[idx]
+      const txt = text[idx]
       content[book] = content[book] || []
       content[book].push({
-        key: page,
-        image: img.handle,
-        text: txt.handle,
+        key: idx + 1,
+        image: img,
+        text: txt,
       })
     })
   }
@@ -139,27 +132,4 @@ async function getContent(
   useGlobalStore().setProofReadingContent(content)
 
   return content
-}
-
-function getFileKey(fileName: string, type: SubFolder): number {
-  const error = ['无法提取页数', `实际文件名：${fileName}`]
-  if (type === SubFolder.Image) {
-    // a01-3_ページ_37_画像_0001.jpg
-    const matched = fileName.match(/_ページ_(\d+)_/)
-    if (matched) {
-      const page = parseInt(matched[1])
-      if (page > 0) return page
-    }
-    error.push('预期格式：xxx_ページ_001_xxxx')
-  }
-  if (type === SubFolder.Text) {
-    // 0040_main.txt
-    const matched = fileName.match(/(\d+)_main/)
-    if (matched) {
-      const page = parseInt(matched[1])
-      if (page > 0) return page
-    }
-    error.push('预期格式：0001_main')
-  }
-  throw error.join('\n')
 }

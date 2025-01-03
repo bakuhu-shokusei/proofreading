@@ -1,11 +1,8 @@
 <template>
   <div class="image-container">
     <h3 class="file-name">{{ pageDetail.imageFileName }}</h3>
-    <div class="img-container" @mousedown="mouseDown">
-      <img
-        :src="pageDetail.imageUrl"
-        :style="{ width: `${Math.round(100 * zoomLevel)}%` }"
-      />
+    <div ref="imgContainer" class="img-container" @mousedown="mouseDown">
+      <img :src="pageDetail.imageUrl" :style="imgStyle" />
     </div>
     <div class="controls">
       <div class="controls-text">放大</div>
@@ -23,7 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core'
+import type { CSSProperties } from 'vue'
+import { ref, computed } from 'vue'
+import { useStorage, useResizeObserver } from '@vueuse/core'
 import { Slider } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { useProofreadingStore } from '../../store'
@@ -31,7 +30,31 @@ import { useProofreadingStore } from '../../store'
 const proofreadingStore = useProofreadingStore()
 const { pageDetail } = storeToRefs(proofreadingStore)
 
+const fitWidthOrHeight = ref<'width' | 'height'>()
+const imgContainer = ref<HTMLDivElement>()
+useResizeObserver(imgContainer, (entries) => {
+  const entry = entries[0]
+  const { width: w0, height: h0 } = entry.contentRect
+  const ratioContainer = h0 / w0
+
+  const img = imgContainer.value?.querySelector('img')
+  if (!img) return
+  const ratioImg = img.height / img.width
+
+  fitWidthOrHeight.value = ratioContainer > ratioImg ? 'width' : 'height'
+})
+
 const zoomLevel = useStorage('image-zoom-level', 1)
+const imgStyle = computed<CSSProperties>(() => {
+  const length = `${Math.round(100 * zoomLevel.value)}%`
+  if (fitWidthOrHeight.value === 'width') {
+    return { width: length }
+  }
+  if (fitWidthOrHeight.value === 'height') {
+    return { height: length }
+  }
+  return {}
+})
 
 const mouseDown = (e: MouseEvent) => {
   e.preventDefault()
@@ -90,6 +113,12 @@ h3 {
     overflow: auto;
     cursor: grab;
     scrollbar-width: thin;
+    position: relative;
+    & > img {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
   }
 }
 </style>

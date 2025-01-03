@@ -36,8 +36,12 @@ const mouseDown = (e: MouseEvent) => {
   function onMove(e: MouseEvent) {
     const clientX = e.clientX
     const delta = clientX - prev
+    const MIN_SPACE = 100
+    const min = MIN_SPACE / containerWidth!
+    const max = 1 - min
+    const target = (imageWidth! + delta) / containerWidth!
     imageWidthPercentage.value =
-      (((imageWidth! + delta) / containerWidth!) * 100).toFixed(2) + '%'
+      (Math.max(min, Math.min(max, target)) * 100).toFixed(2) + '%'
   }
   function onEnd() {
     document.removeEventListener('mousemove', onMove)

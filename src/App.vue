@@ -4,6 +4,7 @@
     <Header />
     <Search v-show="currentPage === CurrentPage.Search" />
     <Proofreading v-if="currentPage === CurrentPage.Proofreading" />
+    <FileList v-if="currentPage === CurrentPage.FileList" />
   </div>
 </template>
 
@@ -14,6 +15,7 @@ import Search from './components/search/Search.vue'
 import Proofreading from './components/proof-reading/Proofreading.vue'
 import Header from './components/shared/Header.vue'
 import { CurrentPage, useGlobalStore } from './store/global'
+import FileList from './components/file-list/FileList.vue'
 
 const { currentPage } = storeToRefs(useGlobalStore())
 </script>

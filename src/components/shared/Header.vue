@@ -11,7 +11,11 @@
 <script lang="ts" setup>
 import { h, computed } from 'vue'
 import type { CSSProperties } from 'vue'
-import { SearchOutlined, FileImageOutlined } from '@ant-design/icons-vue'
+import {
+  SearchOutlined,
+  FileImageOutlined,
+  FolderOpenFilled,
+} from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
 import { Menu } from 'ant-design-vue'
 import type { MenuProps } from 'ant-design-vue'
@@ -41,6 +45,11 @@ const items = computed<MenuProps['items']>(() => {
         label: i,
       })),
     },
+    {
+      key: CurrentPage.FileList,
+      icon: () => h(FolderOpenFilled),
+      label: '文件列表',
+    },
   ]
 })
 
@@ -49,7 +58,7 @@ const onSelect: MenuProps['onSelect'] = ({ key }) => {
     notSavedWarning.value = true
     return
   }
-  if (key === CurrentPage.Search) {
+  if (key === CurrentPage.Search || key === CurrentPage.FileList) {
     updateCurrentPage(key)
   } else {
     updateCurrentPage(CurrentPage.Proofreading)
@@ -60,6 +69,7 @@ const onSelect: MenuProps['onSelect'] = ({ key }) => {
 const current = computed(() => {
   if (currentPage.value === CurrentPage.Proofreading)
     return [proofreadingStore.book as string]
+  if (currentPage.value === CurrentPage.FileList) return [CurrentPage.FileList]
   if (currentPage.value === CurrentPage.Search) return [CurrentPage.Search]
   return []
 })

@@ -41,20 +41,20 @@ const exampleDirectory = `
 目标文件夹（←选这个）
 ├── 书1
 │   ├── img
-│   │   ├── xxx_ページ_001_xxxx.jpg
-│   │   └── xxx_ページ_002_xxxx.jpg
+│   │   ├── 001.jpg
+│   │   └── 002.jpg
 │   └── txt
-│       ├── 0001_main.txt
-│       └── 0002_main.txt
+│       ├── 001.txt
+│       └── 002.txt
 └── 书2
     ├── img
-    │   ├── xxx_ページ_001_xxxx.jpg
-    │   ├── xxx_ページ_002_xxxx.jpg
-    │   └── xxx_ページ_003_xxxx.jpg
+    │   ├── 001.jpg
+    │   ├── 002.jpg
+    │   └── 003.jpg
     └── txt
-        ├── 0001_main.txt
-        ├── 0002_main.txt
-        └── 0003_main.txt
+        ├── 001.txt
+        ├── 002.txt
+        └── 003.txt
 `
 
 const showHelp = ref(false)
