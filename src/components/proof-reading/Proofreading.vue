@@ -6,7 +6,18 @@
     <div v-else class="content">
       <div class="left-right">
         <Image />
-        <div class="divider" @mousedown="mouseDown"><div class="inner" /></div>
+        <div class="divider" @mousedown="mouseDown" tabindex="0">
+          <div class="inner">
+            <svg
+              width="16px"
+              height="16px"
+              preserveAspectRatio="xMidYMid meet"
+              viewBox="0 0 24 24"
+            >
+              <path fill="currentColor" d="M11 21H9V3h2zm4-18h-2v18h2z"></path>
+            </svg>
+          </div>
+        </div>
         <Text />
       </div>
       <Controls />
@@ -75,11 +86,16 @@ const mouseDown = (e: MouseEvent) => {
       flex: 1;
     }
     .divider {
-      cursor: col-resize;
-      padding: 0 2px;
+      cursor: ew-resize;
       .inner {
-        border-left: 1px solid rgba(5, 5, 5, 0.06);
+        background-color: rgba(5, 5, 5, 0.03);
         height: 100%;
+        display: flex;
+        align-items: center;
+        color: var(--text-main);
+        &:hover {
+          background-color: rgba(5, 5, 5, 0.06);
+        }
       }
     }
   }
