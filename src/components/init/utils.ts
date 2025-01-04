@@ -1,4 +1,4 @@
-import { get, set, del } from 'idb-keyval'
+import { get, set } from 'idb-keyval'
 import { useGlobalStore } from '../../store/global'
 
 function getDirectoryHandle() {
@@ -38,38 +38,42 @@ export async function getContentFromUserAction() {
   return getContent(dirHandle)
 }
 
-async function checkHistory(): Promise<FileSystemDirectoryHandle | null> {
-  try {
-    const dirHandle = await get<FileSystemDirectoryHandle>(
-      PROOFREADING_DIRECTORY,
-    )
-    const options: FileSystemHandlePermissionDescriptor = { mode: 'readwrite' }
-    if (dirHandle) {
-      if ((await dirHandle.queryPermission(options)) === 'granted') {
-        return dirHandle
-      }
-      if ((await dirHandle.requestPermission(options)) === 'granted') {
-        return dirHandle
-      }
+export async function getDirectoryHistory() {
+  const dirHandle = await get<FileSystemDirectoryHandle>(PROOFREADING_DIRECTORY)
+  if (dirHandle instanceof FileSystemDirectoryHandle) {
+    return {
+      name: dirHandle.name,
+      handle: dirHandle,
     }
-    return null
-  } catch {
+  } else {
     return null
   }
 }
 
-export async function getContentFromHistory(): Promise<boolean> {
-  const dirHandle = await checkHistory()
-  if (dirHandle !== null) {
-    try {
-      await getContent(dirHandle)
+async function checkHistory(
+  dirHandle: FileSystemDirectoryHandle,
+): Promise<boolean> {
+  try {
+    const options: FileSystemHandlePermissionDescriptor = { mode: 'readwrite' }
+    if ((await dirHandle.queryPermission(options)) === 'granted') {
       return true
-    } catch (e) {
-      await del(PROOFREADING_DIRECTORY)
-      throw e
     }
+    if ((await dirHandle.requestPermission(options)) === 'granted') {
+      return true
+    }
+    return false
+  } catch {
+    return false
   }
-  return false
+}
+
+export async function getContentFromHistory(
+  dirHandle: FileSystemDirectoryHandle,
+) {
+  const ok = await checkHistory(dirHandle)
+  if (ok) {
+    await getContent(dirHandle)
+  }
 }
 
 async function getContent(

@@ -2,7 +2,7 @@
   <div v-if="!browserSupported" class="error">
     <a-alert message="需要Chrome或Edge浏览器" type="error" show-icon />
   </div>
-  <div v-else-if="recoveredFromHistory === false" class="file-system">
+  <div class="file-system">
     <div class="upload-drag" @click="getDirectory">
       <p class="icon">
         <inbox-outlined />
@@ -24,17 +24,39 @@
         <div class="directory-example">{{ exampleDirectory.trim() }}</div>
       </a-modal>
     </div>
+
+    <template v-if="directoryHistory">
+      <Divider :style="{ fontSize: '12px' }">OR</Divider>
+      <div
+        class="directory-history"
+        @click="getFromHistory(directoryHistory.handle)"
+      >
+        之前选择的文件夹
+        <div class="previous-directory">
+          <FolderOutlined class="icon" />
+          {{ directoryHistory.name }}
+        </div>
+      </div>
+    </template>
   </div>
-  <div v-if="browserSupported && recoveredFromHistory === null" class="spin">
+  <div v-if="browserSupported && directoryHistory === undefined" class="spin">
     <a-spin size="large" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { message } from 'ant-design-vue'
-import { InboxOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
-import { getContentFromHistory, getContentFromUserAction } from './utils'
+import { onMounted, ref, shallowRef } from 'vue'
+import { message, Divider } from 'ant-design-vue'
+import {
+  InboxOutlined,
+  InfoCircleOutlined,
+  FolderOutlined,
+} from '@ant-design/icons-vue'
+import {
+  getContentFromHistory,
+  getContentFromUserAction,
+  getDirectoryHistory,
+} from './utils'
 
 const browserSupported = typeof window.showDirectoryPicker === 'function'
 const exampleDirectory = `
@@ -58,7 +80,8 @@ const exampleDirectory = `
 `
 
 const showHelp = ref(false)
-const recoveredFromHistory = ref<boolean | null>(null)
+type DirectoryHistory = Awaited<ReturnType<typeof getDirectoryHistory>>
+const directoryHistory = shallowRef<DirectoryHistory | undefined>(undefined)
 
 const getDirectory = async () => {
   try {
@@ -70,16 +93,16 @@ const getDirectory = async () => {
   }
 }
 
-onMounted(async () => {
+const getFromHistory = async (dirHandle: FileSystemDirectoryHandle) => {
   try {
-    const recovered = await getContentFromHistory()
-    recoveredFromHistory.value = recovered
+    await getContentFromHistory(dirHandle)
   } catch (e) {
     message.error(`${e}`)
-    setTimeout(() => {
-      location.reload()
-    }, 1000)
   }
+}
+
+onMounted(async () => {
+  directoryHistory.value = await getDirectoryHistory()
 })
 </script>
 
@@ -97,6 +120,8 @@ p {
   align-items: center;
   justify-content: center;
   height: 100dvh;
+  max-width: 800px;
+  margin: 0 auto;
   .upload-drag {
     background: rgba(0, 0, 0, 0.02);
     border: 1px dashed #d9d9d9;
@@ -124,6 +149,30 @@ p {
     font-size: 14px;
     color: var(--text-main);
     cursor: pointer;
+  }
+  .directory-history {
+    font-family: var(--font-chinese);
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-main);
+    .previous-directory {
+      cursor: pointer;
+      color: rgba(0, 0, 0, 0.88);
+      font-size: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 32px;
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px dashed #d9d9d9;
+      border-radius: 8px;
+      padding: 16px;
+      .icon {
+        font-size: 20px;
+        margin-right: 8px;
+        color: #1677ff;
+      }
+    }
   }
 }
 
