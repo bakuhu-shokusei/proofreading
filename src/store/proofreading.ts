@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useGlobalStore } from './global'
 import { createFileURL, getFileName, readFile, writeFile } from '../utils'
 
-export const useProofreadingStore = defineStore('Proofreading', () => {
+export const useProofreadingStore = defineStore('proofreading', () => {
   const { proofreadingContent } = useGlobalStore()
 
   const book = ref<string>()

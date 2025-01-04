@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import type { ProofreadingContent } from '../components/init/utils'
 
 export enum CurrentPage {
@@ -15,7 +15,7 @@ export const useGlobalStore = defineStore('global', () => {
     currentPage.value = page
   }
 
-  const proofreadingContent = ref<ProofreadingContent>()
+  const proofreadingContent = shallowRef<ProofreadingContent>()
   const setProofReadingContent = (content: ProofreadingContent) => {
     proofreadingContent.value = content
 

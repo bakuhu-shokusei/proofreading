@@ -1,5 +1,5 @@
 import { get, set } from 'idb-keyval'
-import { useGlobalStore } from '../../store/global'
+import { useGlobalStore, useStatusStore } from '../../store'
 
 function getDirectoryHandle() {
   return showDirectoryPicker({
@@ -35,7 +35,7 @@ const PROOFREADING_DIRECTORY = 'proofreading-directory'
 export async function getContentFromUserAction() {
   const dirHandle = await getDirectoryHandle()
   await set(PROOFREADING_DIRECTORY, dirHandle)
-  return getContent(dirHandle)
+  await getContent(dirHandle)
 }
 
 export async function getDirectoryHistory() {
@@ -76,9 +76,7 @@ export async function getContentFromHistory(
   }
 }
 
-async function getContent(
-  dirHandle: FileSystemDirectoryHandle,
-): Promise<ProofreadingContent> {
+async function getContent(dirHandle: FileSystemDirectoryHandle) {
   const content: ProofreadingContent = {}
 
   const buf: Buf = {}
@@ -133,7 +131,6 @@ async function getContent(
     })
   }
 
+  await useStatusStore().initStatus(dirHandle, content)
   useGlobalStore().setProofReadingContent(content)
-
-  return content
 }

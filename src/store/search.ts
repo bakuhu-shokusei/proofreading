@@ -11,7 +11,7 @@ interface SearchResult {
   }[]
 }
 
-export const useSearchStore = defineStore('Search', () => {
+export const useSearchStore = defineStore('search', () => {
   const { proofreadingContent } = useGlobalStore()
 
   const keyword = ref('')

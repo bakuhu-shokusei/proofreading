@@ -1,6 +1,13 @@
 <template>
   <div class="text-container">
-    <h3 class="file-name">{{ pageDetail.textFileName }}</h3>
+    <h3 class="file-name">
+      {{ pageDetail.textFileName }}
+      <CompletedStatus
+        :style="{ fontSize: '20px', marginLeft: 'auto' }"
+        :book="book!"
+        :text-file-name="pageDetail.textFileName"
+      />
+    </h3>
     <Textarea
       class="text-content"
       :class="{ 'is-vertical': isVertical }"
@@ -18,9 +25,10 @@ import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { Textarea, Switch } from 'ant-design-vue'
 import { useProofreadingStore } from '../../store'
+import { CompletedStatus } from '../shared'
 
 const proofreadingStore = useProofreadingStore()
-const { pageDetail } = storeToRefs(proofreadingStore)
+const { book, pageDetail } = storeToRefs(proofreadingStore)
 const isVertical = useStorage('text-area-is-vertical', true)
 </script>
 
@@ -42,6 +50,8 @@ h3 {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
   }
 
   .text-content {

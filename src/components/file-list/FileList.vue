@@ -13,9 +13,18 @@
             <span class="table-header-cell"> {{ column.title }} </span>
           </template>
           <template #bodyCell="{ column, record }">
-            <span class="table-body-cell" @click="record.onClick">
-              {{ column.key === 'text' ? record.text : record.image }}
+            <span
+              v-if="column.key !== 'completed'"
+              class="table-body-cell"
+              @click="record.onClick"
+            >
+              {{ record[column.key!] }}
             </span>
+            <CompletedStatus
+              v-else
+              :book="record.completed.book"
+              :text-file-name="record.completed.textFileName"
+            />
           </template>
         </Table>
       </div>
@@ -27,6 +36,7 @@
 import { computed } from 'vue'
 import { Table } from 'ant-design-vue'
 import type { TableProps } from 'ant-design-vue'
+import { CompletedStatus } from '../shared'
 import { CurrentPage, useGlobalStore, useProofreadingStore } from '../../store'
 
 const globalStore = useGlobalStore()
@@ -40,6 +50,11 @@ const list = computed(() => {
   const books = Object.keys(content)
   return books.map((book) => {
     const columns: TableProps['columns'] = [
+      {
+        title: '校对状态',
+        dataIndex: 'completed',
+        key: 'completed',
+      },
       {
         title: '图片文件',
         dataIndex: 'image',
@@ -56,6 +71,7 @@ const list = computed(() => {
         return {
           image: image.name,
           text: text.name,
+          completed: { book, textFileName: text.name },
           onClick: () => {
             goToDetail(book, idx)
           },
