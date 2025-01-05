@@ -10,6 +10,7 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { CheckCircleOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
 import { useStatusStore } from '../../store'
 
 const statusStore = useStatusStore()
@@ -27,8 +28,12 @@ const isCompleted = computed(() => {
   return bookDetail.completed.has(props.textFileName)
 })
 
-const toggleCompleted = () => {
-  setCompleted(props.book, props.textFileName, !isCompleted.value)
+const toggleCompleted = async () => {
+  try {
+    await setCompleted(props.book, props.textFileName, !isCompleted.value)
+  } catch (e) {
+    message.error(`${e}`)
+  }
 }
 </script>
 

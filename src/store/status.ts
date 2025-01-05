@@ -77,7 +77,7 @@ export const useStatusStore = defineStore('status', () => {
     } catch {
       parsed = { completed: [] }
     }
-    const list = new Set(parsed.completed)
+    const list = new Set(status.value[book].completed)
     if (completed) {
       list.add(txtName)
     } else {
