@@ -4,20 +4,15 @@
       <Spin size="large" />
     </div>
     <div v-else class="content">
-      <div class="left-right">
+      <div class="display-area" :class="{ 'has-layout': pageDetail.layout }">
         <Image />
-        <div class="divider" @mousedown="mouseDown" tabindex="0">
-          <div class="inner">
-            <svg
-              width="16px"
-              height="16px"
-              preserveAspectRatio="xMidYMid meet"
-              viewBox="0 0 24 24"
-            >
-              <path fill="currentColor" d="M11 21H9V3h2zm4-18h-2v18h2z"></path>
-            </svg>
-          </div>
-        </div>
+        <Divider :onMouseDown="verticalResize" direction="vertical" />
+        <Layout v-if="pageDetail.layout" />
+        <Divider
+          v-if="pageDetail.layout"
+          :onMouseDown="horizontalResize"
+          direction="horizontal"
+        />
         <Text />
       </div>
       <Controls />
@@ -33,33 +28,41 @@ import { useProofreadingStore } from '../../store'
 import Image from './Image.vue'
 import Text from './Text.vue'
 import Controls from './Controls.vue'
+import Divider from './Divider.vue'
+import Layout from './Layout.vue'
 
 const proofreadingStore = useProofreadingStore()
 const { pageDetail } = storeToRefs(proofreadingStore)
 
 const imageWidthPercentage = useStorage('proofreading-image-width', '50%')
+const layoutHeightPercentage = useStorage('proofreading-layout-height', '50%')
 
-const mouseDown = (e: MouseEvent) => {
-  const prev = e.clientX
+const verticalResize = () => {
   const imageWidth = document.querySelector('.image-container')?.clientWidth
-  const containerWidth = document.querySelector('.left-right')?.clientWidth
-  if (!imageWidth || !containerWidth) return
-  function onMove(e: MouseEvent) {
-    const clientX = e.clientX
-    const delta = clientX - prev
+  const containerWidth = document.querySelector('.display-area')?.clientWidth
+  return (delta: { deltaX: number }) => {
+    if (!imageWidth || !containerWidth) return
     const MIN_SPACE = 100
     const min = MIN_SPACE / containerWidth!
     const max = 1 - min
-    const target = (imageWidth! + delta) / containerWidth!
+    const target = (imageWidth + delta.deltaX) / containerWidth
     imageWidthPercentage.value =
       (Math.max(min, Math.min(max, target)) * 100).toFixed(2) + '%'
   }
-  function onEnd() {
-    document.removeEventListener('mousemove', onMove)
-    document.removeEventListener('mouseup', onEnd)
+}
+
+const horizontalResize = () => {
+  const layoutHeight = document.querySelector('.layout-boxes')?.clientHeight
+  const containerHeight = document.querySelector('.display-area')?.clientHeight
+  return (delta: { deltaY: number }) => {
+    if (!layoutHeight || !containerHeight) return
+    const MIN_SPACE = 100
+    const min = MIN_SPACE / containerHeight!
+    const max = 1 - min
+    const target = (layoutHeight + delta.deltaY) / containerHeight
+    layoutHeightPercentage.value =
+      (Math.max(min, Math.min(max, target)) * 100).toFixed(2) + '%'
   }
-  document.addEventListener('mousemove', onMove)
-  document.addEventListener('mouseup', onEnd)
 }
 </script>
 
@@ -76,27 +79,53 @@ const mouseDown = (e: MouseEvent) => {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: minmax(0, 1fr) auto;
-  .left-right {
+  .display-area {
     flex: 1;
-    display: flex;
-    :deep(.image-container) {
-      width: v-bind(imageWidthPercentage);
-    }
-    :deep(.text-container) {
-      flex: 1;
-    }
-    .divider {
-      cursor: ew-resize;
-      .inner {
-        background-color: rgba(5, 5, 5, 0.03);
-        height: 100%;
-        display: flex;
-        align-items: center;
-        color: var(--text-main);
-        &:hover {
-          background-color: rgba(5, 5, 5, 0.06);
-        }
+    &:not(.has-layout) {
+      display: flex;
+      :deep(.image-container) {
+        width: v-bind(imageWidthPercentage);
       }
+      :deep(.text-container) {
+        flex: 1;
+      }
+    }
+    &.has-layout {
+      display: grid;
+      grid-template-columns: v-bind(imageWidthPercentage) 16px minmax(0, 1fr);
+      grid-template-rows: v-bind(layoutHeightPercentage) 16px minmax(0, 1fr);
+      :deep(.image-container) {
+        grid-column: 1 / 2;
+        grid-row: 1 / 4;
+      }
+      :deep(.text-container) {
+        grid-column: 3 / 4;
+        grid-row: 3 / 4;
+      }
+      :deep(.divider.vertical) {
+        grid-column: 2 / 3;
+        grid-row: 1 / 4;
+      }
+      :deep(.divider.horizontal) {
+        grid-column: 3 / 4;
+        grid-row: 2 / 3;
+      }
+      :deep(.layout-boxes) {
+        grid-column: 3 / 4;
+        grid-row: 1 / 2;
+      }
+    }
+
+    :deep(.file-name) {
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--text-secondary);
+      margin: 12px 0;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
     }
   }
 }

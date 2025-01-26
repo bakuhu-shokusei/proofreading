@@ -2,7 +2,17 @@
   <div class="image-container">
     <h3 class="file-name">{{ pageDetail.imageFileName }}</h3>
     <div ref="imgContainer" class="img-container" @mousedown="mouseDown">
-      <img :src="pageDetail.imageUrl" :style="imgStyle" />
+      <img ref="imgRef" :src="pageDetail.imageUrl" :style="imgStyle" />
+      <div
+        v-for="({ box, style }, idx) in boxesStyle"
+        :key="genKey(box)"
+        :style="style"
+        class="layout-box"
+        :class="{ selected: idx === pageDetail.layout?.selectedIndex }"
+        @click="proofreadingStore.selectBox(idx)"
+      >
+        <p class="box-number">{{ idx + 1 }}</p>
+      </div>
     </div>
     <div class="controls">
       <div class="controls-text">放大</div>
@@ -22,10 +32,11 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 import { ref, computed } from 'vue'
-import { useStorage, useResizeObserver } from '@vueuse/core'
+import { useStorage, useResizeObserver, useElementSize } from '@vueuse/core'
 import { Slider } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { useProofreadingStore } from '../../store'
+import { genKey, type Box } from '../../utils'
 
 const proofreadingStore = useProofreadingStore()
 const { pageDetail } = storeToRefs(proofreadingStore)
@@ -43,6 +54,8 @@ useResizeObserver(imgContainer, (entries) => {
 
   fitWidthOrHeight.value = ratioContainer > ratioImg ? 'width' : 'height'
 })
+const imgRef = ref<HTMLImageElement>()
+const imgSize = useElementSize(imgRef)
 
 const zoomLevel = useStorage('image-zoom-level', 1)
 const imgStyle = computed<CSSProperties>(() => {
@@ -54,6 +67,21 @@ const imgStyle = computed<CSSProperties>(() => {
     return { height: length }
   }
   return {}
+})
+const boxesStyle = computed<{ box: Box; style: CSSProperties }[]>(() => {
+  const width = imgSize.width.value
+  const height = imgSize.height.value
+  return (proofreadingStore.pageDetail.layout?.boxes || []).map((box) => {
+    return {
+      box,
+      style: {
+        left: Math.round(width * box.xmin) + 'px',
+        top: Math.round(height * box.ymin) + 'px',
+        width: Math.round(width * (box.xmax - box.xmin)) + 'px',
+        height: Math.round(height * (box.ymax - box.ymin)) + 'px',
+      },
+    }
+  })
 })
 
 const mouseDown = (e: MouseEvent) => {
@@ -79,24 +107,16 @@ const mouseDown = (e: MouseEvent) => {
 </script>
 
 <style lang="scss" scoped>
-h3 {
+h3,
+p {
   margin: 0;
 }
 
 .image-container {
-  margin: 0 12px;
+  padding: 0 12px;
   display: flex;
   flex-direction: column;
 
-  .file-name {
-    font-size: 12px;
-    line-height: 16px;
-    color: var(--text-secondary);
-    margin: 12px 0;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
   .controls {
     display: flex;
     align-items: center;
@@ -118,6 +138,22 @@ h3 {
       position: absolute;
       top: 0;
       left: 0;
+    }
+    .layout-box {
+      position: absolute;
+      border: 2px solid rgba(var(--primary-blue-rgb), 0.3);
+      &.selected {
+        border-color: rgba(var(--primary-blue-rgb), 1);
+        background-color: rgba(var(--primary-blue-rgb), 0.1);
+      }
+      .box-number {
+        position: absolute;
+        width: 100%;
+        bottom: 100%;
+        text-align: center;
+        color: rgba(var(--primary-blue-rgb), 0.6);
+        font-size: 12px;
+      }
     }
   }
 }

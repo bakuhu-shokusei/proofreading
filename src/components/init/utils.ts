@@ -12,6 +12,7 @@ interface ImageTextPair {
   key: number
   image: FileSystemFileHandle
   text: FileSystemFileHandle
+  json?: FileSystemFileHandle
 }
 
 export interface ProofreadingContent {
@@ -20,14 +21,16 @@ export interface ProofreadingContent {
 
 interface Buf {
   [s: string]: {
-    image: FileSystemFileHandle[]
-    text: FileSystemFileHandle[]
+    img: FileSystemFileHandle[]
+    txt: FileSystemFileHandle[]
+    json?: FileSystemFileHandle[]
   }
 }
 
 enum SubFolder {
   Text = 'txt',
   Image = 'img',
+  Json = 'json',
 }
 
 const PROOFREADING_DIRECTORY = 'proofreading-directory'
@@ -87,7 +90,9 @@ async function getContent(dirHandle: FileSystemDirectoryHandle) {
         const subName = subFolder.name
         if (
           subFolder.kind === 'directory' &&
-          (subName === SubFolder.Text || subName === SubFolder.Image)
+          (subName === SubFolder.Text ||
+            subName === SubFolder.Image ||
+            subName === SubFolder.Json)
         ) {
           const files: FileSystemFileHandle[] = []
           for await (const file of subFolder.values()) {
@@ -98,13 +103,8 @@ async function getContent(dirHandle: FileSystemDirectoryHandle) {
           files.sort((a, b) => a.name.localeCompare(b.name))
           files.forEach((file) => {
             buf[name] = buf[name] || {}
-            if (subName === SubFolder.Text) {
-              buf[name].text = buf[name].text || []
-              buf[name].text.push(file)
-            } else {
-              buf[name].image = buf[name].image || []
-              buf[name].image.push(file)
-            }
+            buf[name][subName] = buf[name][subName] || []
+            buf[name][subName].push(file)
           })
         }
       }
@@ -112,12 +112,14 @@ async function getContent(dirHandle: FileSystemDirectoryHandle) {
   }
   if (Object.keys(buf).length === 0) throw `未找到有效内容`
 
-  for (const [book, { image = [], text = [] }] of Object.entries(buf)) {
-    if (image.length !== text.length)
+  for (const [book, buffer] of Object.entries(buf)) {
+    const [image, text, json] = [buffer.img, buffer.txt, buffer.json]
+    if (image.length !== text.length || (json && image.length !== json.length))
       throw [
         '页数不一致',
         `图片：${image.length}页`,
         `文字(txt文件)：${text.length}页`,
+        ...(json ? [`json：${json.length}页`] : []),
       ].join('\n')
     Array.from({ length: image.length }).forEach((_, idx) => {
       const img = image[idx]
@@ -127,10 +129,29 @@ async function getContent(dirHandle: FileSystemDirectoryHandle) {
         key: idx + 1,
         image: img,
         text: txt,
+        ...(json ? { json: json[idx] } : {}),
       })
     })
   }
 
   await useStatusStore().initStatus(dirHandle, content)
   useGlobalStore().setProofReadingContent(content)
+}
+
+async function listAllFiles(dirHandle: FileSystemDirectoryHandle) {
+  const files: {
+    name: string
+    handle: FileSystemFileHandle
+    kind: 'file'
+  }[] = []
+  for await (let [name, handle] of dirHandle) {
+    const { kind } = handle
+    if (kind === 'directory') {
+      // files.push({ name, handle, kind })
+      files.push(...(await listAllFiles(handle)))
+    } else {
+      files.push({ name, handle, kind })
+    }
+  }
+  return files
 }

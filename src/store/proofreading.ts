@@ -1,14 +1,36 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useGlobalStore } from './global'
-import { createFileURL, getFileName, readFile, writeFile } from '../utils'
+import {
+  createFileURL,
+  getFileName,
+  readFile,
+  writeFile,
+  convertFormat,
+} from '../utils'
+import type { Box } from '../utils'
+
+interface Detail {
+  ready: boolean
+  imageFileName: string
+  imageUrl: string
+  textFileName: string
+  textContent: string
+  textContentCopy: string
+  layout?: {
+    jsonFileName: string
+    boxes: Box[]
+    boxesCopy: Box[]
+    selectedIndex: number
+  }
+}
 
 export const useProofreadingStore = defineStore('proofreading', () => {
   const { proofreadingContent } = useGlobalStore()
 
   const book = ref<string>()
   const page = ref<number>() // start from 1
-  const pageDetail = ref({
+  const pageDetail = ref<Detail>({
     ready: false,
     imageFileName: '',
     imageUrl: '',
@@ -47,6 +69,16 @@ export const useProofreadingStore = defineStore('proofreading', () => {
       textContent,
       textContentCopy: textContent,
     }
+
+    if (detail.json) {
+      const boxes = convertFormat(JSON.parse(await readFile(detail.json)))
+      pageDetail.value.layout = {
+        jsonFileName: getFileName(detail.json),
+        boxes: boxes,
+        boxesCopy: structuredClone(boxes),
+        selectedIndex: -1,
+      }
+    }
   }
 
   const updatePage = (newPage: number) => {
@@ -67,6 +99,14 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     pageDetail.value.textContentCopy = pageDetail.value.textContent
   }
 
+  // layout
+  const selectBox = (index: number /* start at 0 */) => {
+    if (!pageDetail.value.layout) return
+    const boxes = pageDetail.value.layout.boxesCopy
+    if (index < 0 || index >= boxes.length) return
+    pageDetail.value.layout.selectedIndex = index
+  }
+
   return {
     book,
     page,
@@ -78,5 +118,6 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     resetDraft,
     saveChanges,
     notSavedWarning,
+    selectBox,
   }
 })

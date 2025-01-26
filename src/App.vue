@@ -36,5 +36,7 @@ const { currentPage } = storeToRefs(useGlobalStore())
     'Hiragino Sans', Meiryo, sans-serif;
   --text-main: rgba(0, 0, 0, 0.88);
   --text-secondary: rgba(0, 0, 0, 0.65);
+  --primary-blue-rgb: 22, 119, 255;
+  --primary-blue: rgb(22, 119, 255);
 }
 </style>

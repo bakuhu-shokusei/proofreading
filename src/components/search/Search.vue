@@ -139,7 +139,7 @@ const goToDetail = (book: string, index: number) => {
           margin: 12px 0;
         }
         .card-title {
-          color: #1677ff;
+          color: var(--primary-blue);
           cursor: pointer;
         }
         .text-content {

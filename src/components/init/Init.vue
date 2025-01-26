@@ -65,9 +65,12 @@ const exampleDirectory = `
 │   ├── img
 │   │   ├── 001.jpg
 │   │   └── 002.jpg
-│   └── txt
-│       ├── 001.txt
-│       └── 002.txt
+│   ├── txt
+│   │   ├── 001.txt
+│   │   └── 002.txt
+│   └── json（可选）
+│       ├── 001.json
+│       └── 002.json
 └── 书2
     ├── img
     │   ├── 001.jpg
@@ -130,7 +133,7 @@ p {
     padding: 16px;
     text-align: center;
     .icon {
-      color: #1677ff;
+      color: var(--primary-blue);
       font-size: 48px;
       margin-bottom: 8px;
     }
@@ -170,7 +173,7 @@ p {
       .icon {
         font-size: 20px;
         margin-right: 8px;
-        color: #1677ff;
+        color: var(--primary-blue);
       }
     }
   }
