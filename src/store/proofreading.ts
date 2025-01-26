@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, toRaw } from 'vue'
 import { useGlobalStore } from './global'
 import {
   createFileURL,
@@ -20,8 +20,9 @@ interface Detail {
   layout?: {
     jsonFileName: string
     boxes: Box[]
-    boxesCopy: Box[]
-    selectedIndex: number
+    boxesEditHistory: Box[][]
+    editIndex: number // pointer to the current history
+    selectedIndex: number // selected box
   }
 }
 
@@ -75,7 +76,8 @@ export const useProofreadingStore = defineStore('proofreading', () => {
       pageDetail.value.layout = {
         jsonFileName: getFileName(detail.json),
         boxes: boxes,
-        boxesCopy: structuredClone(boxes),
+        boxesEditHistory: [structuredClone(boxes)],
+        editIndex: 0,
         selectedIndex: -1,
       }
     }
@@ -102,9 +104,40 @@ export const useProofreadingStore = defineStore('proofreading', () => {
   // layout
   const selectBox = (index: number /* start at 0 */) => {
     if (!pageDetail.value.layout) return
-    const boxes = pageDetail.value.layout.boxesCopy
+    const boxes = currentBoxes.value
     if (index < 0 || index >= boxes.length) return
     pageDetail.value.layout.selectedIndex = index
+  }
+  const currentBoxes = computed<Box[]>(() => {
+    if (!pageDetail.value.layout) return []
+    return pageDetail.value.layout.boxesEditHistory[
+      pageDetail.value.layout.editIndex
+    ]
+  })
+  const dragBox = (e: { moved?: { newIndex: number; oldIndex: number } }) => {
+    if (!e.moved || !pageDetail.value.layout) return
+    const newBoxes = structuredClone(toRaw(currentBoxes.value))
+    const toIndex = newBoxes.length - 1 - e.moved.newIndex
+    const fromIndex = newBoxes.length - 1 - e.moved.oldIndex
+    const element = newBoxes[fromIndex]
+    newBoxes.splice(fromIndex, 1)
+    newBoxes.splice(toIndex, 0, element)
+    pushHistory(newBoxes)
+    pageDetail.value.layout.selectedIndex = toIndex
+  }
+  const MAX_RECORD = 10
+  const pushHistory = (boxes: Box[]) => {
+    const layout = pageDetail.value.layout
+    if (!layout) return
+    layout.boxesEditHistory = [
+      ...layout.boxesEditHistory.slice(0, layout.editIndex + 1),
+      boxes,
+    ]
+    layout.editIndex++
+    while (layout.boxesEditHistory.length > MAX_RECORD) {
+      layout.boxesEditHistory.shift()
+      layout.editIndex--
+    }
   }
 
   return {
@@ -119,5 +152,7 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     saveChanges,
     notSavedWarning,
     selectBox,
+    currentBoxes,
+    dragBox,
   }
 })

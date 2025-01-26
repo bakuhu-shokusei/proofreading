@@ -43,7 +43,8 @@ export function saveBack(boxes: Box[], old: JsonOutput): JsonOutput {
 }
 
 export function genKey(box: Box) {
-  return [box.xmin, box.ymin, box.xmax, box.ymax]
-    .map((i) => Math.round((i * 10) ^ 6))
+  const key = [box.xmin, box.ymin, box.xmax, box.ymax]
+    .map((i) => Math.round(i * 10 ** 6))
     .join('-')
+  return key
 }

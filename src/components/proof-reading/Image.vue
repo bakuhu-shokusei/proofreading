@@ -39,7 +39,7 @@ import { useProofreadingStore } from '../../store'
 import { genKey, type Box } from '../../utils'
 
 const proofreadingStore = useProofreadingStore()
-const { pageDetail } = storeToRefs(proofreadingStore)
+const { pageDetail, currentBoxes } = storeToRefs(proofreadingStore)
 
 const fitWidthOrHeight = ref<'width' | 'height'>()
 const imgContainer = ref<HTMLDivElement>()
@@ -71,7 +71,7 @@ const imgStyle = computed<CSSProperties>(() => {
 const boxesStyle = computed<{ box: Box; style: CSSProperties }[]>(() => {
   const width = imgSize.width.value
   const height = imgSize.height.value
-  return (proofreadingStore.pageDetail.layout?.boxes || []).map((box) => {
+  return currentBoxes.value.map((box) => {
     return {
       box,
       style: {
