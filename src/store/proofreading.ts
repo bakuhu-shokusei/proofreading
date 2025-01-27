@@ -94,6 +94,7 @@ export const useProofreadingStore = defineStore('proofreading', () => {
   }
 
   const saveChanges = async () => {
+    await saveJson(false)
     if (!proofreadingContent || !book.value || !page.value) return
     const detail = proofreadingContent[book.value]?.[page.value - 1]
     if (!detail) return
@@ -211,14 +212,16 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     }
   }
 
-  const saveJson = async () => {
+  const saveJson = async (needUpdate: boolean) => {
     if (!proofreadingContent || !book.value || !page.value) return
     const detail = proofreadingContent[book.value]?.[page.value - 1]
     if (!detail || !detail.json || !currentEditStatus.value) return
     const original = JSON.parse(await readFile(detail.json))
     const newContent = saveBack(currentEditStatus.value.boxes, original)
     await writeFile(detail.json, JSON.stringify(newContent, null, 2))
-    await update()
+    if (needUpdate) {
+      await update()
+    }
   }
   const jsonChanged = computed(() => {
     if (!pageDetail.value.layout || !currentEditStatus.value) return

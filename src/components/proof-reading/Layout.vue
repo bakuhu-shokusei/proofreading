@@ -12,11 +12,12 @@
         :animation="150"
         @change="proofreadingStore.dragBox($event)"
       >
-        <template #item="{ element }">
+        <template #item="{ element, index }">
           <div
             class="single-box"
             :class="{
               selected: element.index === currentEditStatus?.selectedIndex,
+              'last-box': index === 0,
             }"
             @click="proofreadingStore.selectBox(element.index)"
             :data-box-index="element.index"
@@ -58,7 +59,7 @@
       <Button
         :icon="h(SaveOutlined)"
         type="primary"
-        @click="proofreadingStore.saveJson"
+        @click="proofreadingStore.saveJson(true)"
         :disabled="!jsonChanged"
       >
         保存
@@ -139,6 +140,9 @@ h3 {
       display: flex;
       gap: 8px;
       .single-box {
+        &.last-box {
+          margin-left: auto;
+        }
         background-color: #f0f0f0;
         border-radius: 6px;
         padding: 0 2px 1px 2px;
