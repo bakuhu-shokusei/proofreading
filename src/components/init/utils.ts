@@ -137,21 +137,3 @@ async function getContent(dirHandle: FileSystemDirectoryHandle) {
   await useStatusStore().initStatus(dirHandle, content)
   useGlobalStore().setProofReadingContent(content)
 }
-
-async function listAllFiles(dirHandle: FileSystemDirectoryHandle) {
-  const files: {
-    name: string
-    handle: FileSystemFileHandle
-    kind: 'file'
-  }[] = []
-  for await (let [name, handle] of dirHandle) {
-    const { kind } = handle
-    if (kind === 'directory') {
-      // files.push({ name, handle, kind })
-      files.push(...(await listAllFiles(handle)))
-    } else {
-      files.push({ name, handle, kind })
-    }
-  }
-  return files
-}

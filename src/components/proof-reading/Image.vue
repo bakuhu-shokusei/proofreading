@@ -8,7 +8,7 @@
         :key="genKey(box)"
         :style="style"
         class="layout-box"
-        :class="{ selected: idx === pageDetail.layout?.selectedIndex }"
+        :class="{ selected: idx === currentEditStatus?.selectedIndex }"
         @click="proofreadingStore.selectBox(idx)"
       >
         <p class="box-number">{{ idx + 1 }}</p>
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStorage, useResizeObserver, useElementSize } from '@vueuse/core'
 import { Slider } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
@@ -39,7 +39,7 @@ import { useProofreadingStore } from '../../store'
 import { genKey, type Box } from '../../utils'
 
 const proofreadingStore = useProofreadingStore()
-const { pageDetail, currentBoxes } = storeToRefs(proofreadingStore)
+const { pageDetail, currentEditStatus } = storeToRefs(proofreadingStore)
 
 const fitWidthOrHeight = ref<'width' | 'height'>()
 const imgContainer = ref<HTMLDivElement>()
@@ -71,7 +71,7 @@ const imgStyle = computed<CSSProperties>(() => {
 const boxesStyle = computed<{ box: Box; style: CSSProperties }[]>(() => {
   const width = imgSize.width.value
   const height = imgSize.height.value
-  return currentBoxes.value.map((box) => {
+  return (currentEditStatus.value?.boxes || []).map((box) => {
     return {
       box,
       style: {
@@ -104,6 +104,17 @@ const mouseDown = (e: MouseEvent) => {
   document.addEventListener('mousemove', onMove)
   document.addEventListener('mouseup', onEnd)
 }
+
+watch(
+  () => currentEditStatus.value?.selectedIndex,
+  (index) => {
+    if (typeof index !== 'number') return
+    const selected = imgContainer.value?.querySelectorAll('.layout-box')[index]
+    if (selected instanceof Element) {
+      selected.scrollIntoView({ behavior: 'smooth' })
+    }
+  },
+)
 </script>
 
 <style lang="scss" scoped>

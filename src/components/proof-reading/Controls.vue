@@ -15,7 +15,12 @@
     >
       重置
     </Button>
-    <Button type="primary" :disabled="!draftChanged" @click="saveChanges">
+    <Button
+      :icon="h(SaveOutlined)"
+      type="primary"
+      :disabled="!draftChanged"
+      @click="saveChanges"
+    >
       保存修改
     </Button>
 
@@ -25,7 +30,8 @@
       :footer="null"
       :style="{ fontFamily: 'var(--font-chinese)' }"
     >
-      <div>
+      <div v-if="jsonChanged">json文件内容已修改，请<b>保存</b></div>
+      <div v-if="draftChanged">
         txt文件内容已修改，请<b>保存修改</b>或者<b>重置</b>（右下方的按钮）
       </div>
     </Modal>
@@ -33,17 +39,19 @@
 </template>
 
 <script setup lang="ts">
+import { h } from 'vue'
 import { Pagination, Button, Modal } from 'ant-design-vue'
+import { SaveOutlined } from '@ant-design/icons-vue'
 import { useProofreadingStore } from '../../store'
 import { storeToRefs } from 'pinia'
 
 const proofreadingStore = useProofreadingStore()
 const { updatePage, saveChanges, resetDraft } = proofreadingStore
-const { totalPages, page, draftChanged, notSavedWarning } =
+const { totalPages, page, draftChanged, jsonChanged, notSavedWarning } =
   storeToRefs(proofreadingStore)
 
 const onPageChange = (page: number) => {
-  if (!draftChanged.value) {
+  if (!draftChanged.value && !jsonChanged.value) {
     updatePage(page)
     return
   } else {

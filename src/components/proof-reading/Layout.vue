@@ -16,50 +16,104 @@
           <div
             class="single-box"
             :class="{
-              selected: element.index === pageDetail.layout.selectedIndex,
+              selected: element.index === currentEditStatus?.selectedIndex,
             }"
             @click="proofreadingStore.selectBox(element.index)"
             :data-box-index="element.index"
-            tabindex="0"
           >
             <p class="text-number">{{ element.index + 1 }}</p>
-            <Input v-model:value="element.text" class="box-input" />
+            <Input
+              :value="element.text"
+              class="box-input"
+              @update:value="proofreadingStore.saveBox(element.index, $event)"
+            />
           </div>
         </template>
       </Draggable>
+    </div>
+    <div class="control-area">
+      <Button
+        :icon="h(UndoOutlined)"
+        :disabled="!canUndo"
+        @click="proofreadingStore.undoHistory"
+      />
+      <Button
+        :icon="h(RedoOutlined)"
+        :disabled="!canRedo"
+        @click="proofreadingStore.redoHistory"
+      />
+      <Button
+        :icon="h(DeleteOutlined)"
+        danger
+        :disabled="!canDeleteBox"
+        @click="proofreadingStore.deleteBox"
+      />
+      <Button
+        :icon="h(ArrowDownOutlined)"
+        @click="proofreadingStore.replaceTxt"
+        :style="{ marginLeft: 'auto' }"
+      >
+        確定
+      </Button>
+      <Button
+        :icon="h(SaveOutlined)"
+        type="primary"
+        @click="proofreadingStore.saveJson"
+        :disabled="!jsonChanged"
+      >
+        保存
+      </Button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, h, nextTick } from 'vue'
 import Draggable from 'vuedraggable'
 import { storeToRefs } from 'pinia'
-import { Input } from 'ant-design-vue'
+import { Input, Button } from 'ant-design-vue'
+import {
+  UndoOutlined,
+  RedoOutlined,
+  DeleteOutlined,
+  ArrowDownOutlined,
+  SaveOutlined,
+} from '@ant-design/icons-vue'
 import { useProofreadingStore } from '../../store'
 import { genKey } from '../../utils'
 
 const proofreadingStore = useProofreadingStore()
-const { pageDetail, currentBoxes } = storeToRefs(proofreadingStore)
+const {
+  pageDetail,
+  currentEditStatus,
+  canRedo,
+  canUndo,
+  canDeleteBox,
+  jsonChanged,
+} = storeToRefs(proofreadingStore)
 
 const boxesContainer = ref<HTMLDivElement>()
 
 watch(
-  () => pageDetail.value.layout?.selectedIndex,
+  () => currentEditStatus.value?.selectedIndex,
   (index) => {
     if (typeof index !== 'number') return
-    const selected = boxesContainer.value?.querySelector(
-      `.single-box[data-box-index="${index}"]`,
-    )
-    if (selected instanceof Element) {
-      selected.scrollIntoView({ behavior: 'smooth' })
-      selected.querySelector('input')?.focus()
-    }
+    nextTick(() => {
+      const selected = boxesContainer.value?.querySelector(
+        `.single-box[data-box-index="${index}"]`,
+      )
+      if (selected instanceof Element) {
+        selected.querySelector('input')?.focus()
+        // selected.scrollIntoView({ behavior: 'smooth' })
+      }
+    })
   },
 )
 
 const reversedList = computed(() => {
-  return currentBoxes.value.map((i, index) => ({ ...i, index })).reverse()
+  return currentEditStatus.value?.boxes
+    .map((i, index) => ({ ...i, index }))
+    .reverse()
 })
 </script>
 
@@ -117,6 +171,15 @@ h3 {
         }
       }
     }
+  }
+
+  .control-area {
+    color: var(--text-main);
+    font-family: var(--font-japanese);
+    margin: 8px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 </style>

@@ -10,6 +10,7 @@
     </h3>
     <Textarea
       class="text-content is-vertical"
+      id="txt-content-textarea"
       v-model:value="pageDetail.textContentCopy"
     />
   </div>
