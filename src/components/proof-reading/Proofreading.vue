@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div v-if="!pageDetail.ready" class="loading">
-      <Spin size="large" />
-    </div>
-    <div v-else class="content">
+    <div v-if="pageDetail.imageFileName" class="content">
       <div class="display-area" :class="{ 'has-layout': pageDetail.layout }">
         <Image />
         <Divider :onMouseDown="verticalResize" direction="vertical" />
@@ -16,6 +13,9 @@
         <Text />
       </div>
       <Controls />
+    </div>
+    <div v-show="!pageDetail.ready" class="loading">
+      <Spin size="large" />
     </div>
   </div>
 </template>
@@ -68,10 +68,13 @@ const horizontalResize = () => {
 
 <style lang="scss" scoped>
 .loading {
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .content {

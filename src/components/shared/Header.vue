@@ -27,8 +27,7 @@ const { updateCurrentPage } = globalStore
 
 const proofreadingStore = useProofreadingStore()
 const { initialize } = proofreadingStore
-const { notSavedWarning, draftChanged, jsonChanged } =
-  storeToRefs(proofreadingStore)
+const { notSavedWarning, hasUnsavedChanges } = storeToRefs(proofreadingStore)
 
 const items = computed<MenuProps['items']>(() => {
   return [
@@ -55,7 +54,7 @@ const items = computed<MenuProps['items']>(() => {
 })
 
 const onSelect: MenuProps['onSelect'] = ({ key }) => {
-  if (draftChanged.value || jsonChanged.value) {
+  if (hasUnsavedChanges.value) {
     notSavedWarning.value = true
     return
   }

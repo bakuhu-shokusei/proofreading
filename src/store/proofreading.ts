@@ -94,15 +94,33 @@ export const useProofreadingStore = defineStore('proofreading', () => {
   }
 
   const saveChanges = async () => {
-    await saveJson(false)
+    pageDetail.value.ready = false
+
     if (!proofreadingContent || !book.value || !page.value) return
     const detail = proofreadingContent[book.value]?.[page.value - 1]
     if (!detail) return
+
+    // save json
+    if (detail.json && currentEditStatus.value) {
+      const original = JSON.parse(await readFile(detail.json))
+      const newContent = saveBack(currentEditStatus.value.boxes, original)
+      await writeFile(detail.json, JSON.stringify(newContent, null, 2))
+    }
+    // save txt
     await writeFile(detail.text, pageDetail.value.textContentCopy)
+    pageDetail.value.ready = true
+
     await update()
   }
-  const resetDraft = () => {
+  const resetChanges = () => {
     pageDetail.value.textContentCopy = pageDetail.value.textContent
+    const layout = pageDetail.value.layout
+    if (layout) {
+      layout.editHistory = [
+        { boxes: structuredClone(toRaw(layout.boxes)), selectedIndex: -1 },
+      ]
+      layout.editIndex = 0
+    }
   }
 
   // layout
@@ -212,17 +230,6 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     }
   }
 
-  const saveJson = async (needUpdate: boolean) => {
-    if (!proofreadingContent || !book.value || !page.value) return
-    const detail = proofreadingContent[book.value]?.[page.value - 1]
-    if (!detail || !detail.json || !currentEditStatus.value) return
-    const original = JSON.parse(await readFile(detail.json))
-    const newContent = saveBack(currentEditStatus.value.boxes, original)
-    await writeFile(detail.json, JSON.stringify(newContent, null, 2))
-    if (needUpdate) {
-      await update()
-    }
-  }
   const jsonChanged = computed(() => {
     if (!pageDetail.value.layout || !currentEditStatus.value) return
     const newBoxes = currentEditStatus.value.boxes
@@ -231,6 +238,9 @@ export const useProofreadingStore = defineStore('proofreading', () => {
       boxes.map((i) => i.text).join('|') !==
       newBoxes.map((i) => i.text).join('|')
     )
+  })
+  const hasUnsavedChanges = computed(() => {
+    return draftChanged.value || jsonChanged.value
   })
 
   return {
@@ -241,7 +251,7 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     totalPages,
     updatePage,
     draftChanged,
-    resetDraft,
+    resetChanges,
     saveChanges,
     notSavedWarning,
     selectBox,
@@ -255,7 +265,7 @@ export const useProofreadingStore = defineStore('proofreading', () => {
     deleteBox,
     canDeleteBox,
     replaceTxt,
-    saveJson,
     jsonChanged,
+    hasUnsavedChanges,
   }
 })

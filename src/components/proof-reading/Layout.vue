@@ -56,14 +56,6 @@
       >
         確定
       </Button>
-      <Button
-        :icon="h(SaveOutlined)"
-        type="primary"
-        @click="proofreadingStore.saveJson(true)"
-        :disabled="!jsonChanged"
-      >
-        保存
-      </Button>
     </div>
   </div>
 </template>
@@ -78,20 +70,13 @@ import {
   RedoOutlined,
   DeleteOutlined,
   ArrowDownOutlined,
-  SaveOutlined,
 } from '@ant-design/icons-vue'
 import { useProofreadingStore } from '../../store'
 import { genKey } from '../../utils'
 
 const proofreadingStore = useProofreadingStore()
-const {
-  pageDetail,
-  currentEditStatus,
-  canRedo,
-  canUndo,
-  canDeleteBox,
-  jsonChanged,
-} = storeToRefs(proofreadingStore)
+const { pageDetail, currentEditStatus, canRedo, canUndo, canDeleteBox } =
+  storeToRefs(proofreadingStore)
 
 const boxesContainer = ref<HTMLDivElement>()
 

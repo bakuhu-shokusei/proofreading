@@ -10,15 +10,15 @@
     />
     <Button
       :style="{ marginLeft: 'auto', marginRight: '8px' }"
-      :disabled="!draftChanged"
-      @click="resetDraft"
+      :disabled="!hasUnsavedChanges"
+      @click="resetChanges"
     >
       重置
     </Button>
     <Button
       :icon="h(SaveOutlined)"
       type="primary"
-      :disabled="!draftChanged"
+      :disabled="!hasUnsavedChanges"
       @click="saveChanges"
     >
       保存修改
@@ -30,9 +30,12 @@
       :footer="null"
       :style="{ fontFamily: 'var(--font-chinese)' }"
     >
-      <div v-if="jsonChanged">json文件内容已修改，请<b>保存</b></div>
-      <div v-if="draftChanged">
-        txt文件内容已修改，请<b>保存修改</b>或者<b>重置</b>（右下方的按钮）
+      <div>
+        {{
+          [jsonChanged ? 'json文件' : '', draftChanged ? 'txt文件' : '']
+            .filter(Boolean)
+            .join('，')
+        }}内容已修改，请<b>保存修改</b>或者<b>重置</b>（右下方的按钮）
       </div>
     </Modal>
   </div>
@@ -46,12 +49,18 @@ import { useProofreadingStore } from '../../store'
 import { storeToRefs } from 'pinia'
 
 const proofreadingStore = useProofreadingStore()
-const { updatePage, saveChanges, resetDraft } = proofreadingStore
-const { totalPages, page, draftChanged, jsonChanged, notSavedWarning } =
-  storeToRefs(proofreadingStore)
+const { updatePage, saveChanges, resetChanges } = proofreadingStore
+const {
+  totalPages,
+  page,
+  hasUnsavedChanges,
+  jsonChanged,
+  draftChanged,
+  notSavedWarning,
+} = storeToRefs(proofreadingStore)
 
 const onPageChange = (page: number) => {
-  if (!draftChanged.value && !jsonChanged.value) {
+  if (!hasUnsavedChanges.value) {
     updatePage(page)
     return
   } else {
