@@ -14,9 +14,11 @@
       </div>
       <Controls />
     </div>
-    <div v-show="!pageDetail.ready" class="loading">
-      <Spin size="large" />
-    </div>
+    <Transition>
+      <div v-show="!pageDetail.ready" class="loading">
+        <Spin size="large" />
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -75,6 +77,15 @@ const horizontalResize = () => {
   justify-content: center;
   height: 100%;
   background: rgba(0, 0, 0, 0.4);
+
+  &.v-enter-active,
+  &.v-leave-active {
+    transition: background 0.3s ease;
+  }
+  &.v-enter-from,
+  &.v-leave-to {
+    background: rgba(0, 0, 0, 0);
+  }
 }
 
 .content {
