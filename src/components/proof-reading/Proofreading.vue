@@ -44,7 +44,7 @@ const verticalResize = () => {
   const containerWidth = document.querySelector('.display-area')?.clientWidth
   return (delta: { deltaX: number }) => {
     if (!imageWidth || !containerWidth) return
-    const MIN_SPACE = 100
+    const MIN_SPACE = 160
     const min = MIN_SPACE / containerWidth!
     const max = 1 - min
     const target = (imageWidth + delta.deltaX) / containerWidth
@@ -106,8 +106,14 @@ const horizontalResize = () => {
     }
     &.has-layout {
       display: grid;
-      grid-template-columns: v-bind(imageWidthPercentage) 16px minmax(0, 1fr);
-      grid-template-rows: v-bind(layoutHeightPercentage) 16px minmax(0, 1fr);
+      grid-template-columns:
+        minmax(0, v-bind(imageWidthPercentage))
+        16px
+        minmax(0, 1fr);
+      grid-template-rows:
+        minmax(0, v-bind(layoutHeightPercentage))
+        16px
+        minmax(0, 1fr);
       :deep(.image-container) {
         grid-column: 1 / 2;
         grid-row: 1 / 4;

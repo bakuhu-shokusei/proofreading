@@ -144,6 +144,7 @@ const goToDetail = (book: string, index: number) => {
         }
         .text-content {
           font-family: var(--font-japanese);
+          white-space: pre-line;
           :deep(mark) {
             padding: 0;
             background-color: #ffd63f;

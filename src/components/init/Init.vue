@@ -14,7 +14,7 @@
         文件夹结构示例
         <InfoCircleOutlined />
       </p>
-      <a-modal
+      <Modal
         :open="showHelp"
         :footer="null"
         title="文件夹结构示例"
@@ -22,7 +22,7 @@
         @cancel="showHelp = false"
       >
         <div class="directory-example">{{ exampleDirectory.trim() }}</div>
-      </a-modal>
+      </Modal>
     </div>
 
     <template v-if="directoryHistory">
@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, shallowRef } from 'vue'
-import { message, Divider } from 'ant-design-vue'
+import { message, Divider, Modal } from 'ant-design-vue'
 import {
   InboxOutlined,
   InfoCircleOutlined,
@@ -179,14 +179,12 @@ p {
   }
 }
 
-:global(.directory-info-wrapper) {
-  .directory-example {
-    font-family: 'Fira code', 'Fira Mono', source-code-pro, Menlo, Monaco,
-      Consolas, 'Courier New', monospace;
-    font-size: 12px;
-    white-space: pre;
-    color: var(--text-secondary);
-  }
+.directory-example {
+  font-family: 'Fira code', 'Fira Mono', source-code-pro, Menlo, Monaco,
+    Consolas, 'Courier New', monospace;
+  font-size: 16px;
+  white-space: pre;
+  color: var(--text-secondary);
 }
 
 .spin {
@@ -194,5 +192,13 @@ p {
   align-items: center;
   justify-content: center;
   height: 100dvh;
+}
+</style>
+
+<style lang="scss">
+.directory-info-wrapper {
+  .ant-modal-title {
+    font-family: var(--font-chinese);
+  }
 }
 </style>

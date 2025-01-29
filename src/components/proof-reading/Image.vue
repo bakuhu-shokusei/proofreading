@@ -125,8 +125,9 @@ p {
 
 .image-container {
   padding: 0 12px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: max-content minmax(0, 1fr) max-content;
 
   .controls {
     display: flex;
