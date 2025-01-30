@@ -180,6 +180,9 @@ p {
 }
 
 .directory-example {
+  padding: 16px;
+  background-color: #eeeeee;
+  border-radius: 8px;
   font-family: 'Fira code', 'Fira Mono', source-code-pro, Menlo, Monaco,
     Consolas, 'Courier New', monospace;
   font-size: 16px;
