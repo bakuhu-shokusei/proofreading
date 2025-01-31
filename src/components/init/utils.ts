@@ -110,16 +110,16 @@ async function getContent(dirHandle: FileSystemDirectoryHandle) {
       }
     }
   }
-  if (Object.keys(buf).length === 0) throw `未找到有效内容`
+  if (Object.keys(buf).length === 0) throw '有効な入力内容ではありません'
 
   for (const [book, buffer] of Object.entries(buf)) {
     const [image, text, json] = [buffer.img, buffer.txt, buffer.json]
     if (image.length !== text.length || (json && image.length !== json.length))
       throw [
-        '页数不一致',
-        `图片：${image.length}页`,
-        `文字(txt文件)：${text.length}页`,
-        ...(json ? [`json：${json.length}页`] : []),
+        'ページ数が合わない',
+        `画像：${image.length}`,
+        `txt：${text.length}`,
+        ...(json ? [`json：${json.length}`] : []),
       ].join('\n')
     Array.from({ length: image.length }).forEach((_, idx) => {
       const img = image[idx]

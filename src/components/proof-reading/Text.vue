@@ -53,7 +53,6 @@ h3 {
     .controls-text {
       font-family: var(--font-japanese);
       color: var(--text-main);
-      font-family: var(--font-chinese);
       font-size: 12px;
       line-height: 16px;
       margin-right: 8px;

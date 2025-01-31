@@ -13,7 +13,7 @@
       :disabled="!hasUnsavedChanges"
       @click="resetChanges"
     >
-      重置
+      リセット
     </Button>
     <Button
       :icon="h(SaveOutlined)"
@@ -21,21 +21,21 @@
       :disabled="!hasUnsavedChanges"
       @click="saveChanges"
     >
-      保存修改
+      保存
     </Button>
 
     <Modal
       v-model:open="notSavedWarning"
-      title="请确认"
+      title="確認"
       :footer="null"
-      :style="{ fontFamily: 'var(--font-chinese)' }"
+      :style="{ fontFamily: 'var(--font-japanese)' }"
     >
       <div>
         {{
-          [jsonChanged ? 'json文件' : '', draftChanged ? 'txt文件' : '']
+          [jsonChanged ? 'jsonファイル' : '', draftChanged ? 'txtファイル' : '']
             .filter(Boolean)
-            .join('，')
-        }}内容已修改，请<b>保存修改</b>或者<b>重置</b>（右下方的按钮）
+            .join('、')
+        }}は変更されました。<b>保存</b>または<b>リセット</b>してください（右下のボタン）
       </div>
     </Modal>
   </div>

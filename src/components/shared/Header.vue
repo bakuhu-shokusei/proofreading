@@ -34,12 +34,12 @@ const items = computed<MenuProps['items']>(() => {
     {
       key: CurrentPage.Search,
       icon: () => h(SearchOutlined),
-      label: '检索',
+      label: '検索',
     },
     {
       key: CurrentPage.Proofreading,
       icon: () => h(FileImageOutlined),
-      label: '校对',
+      label: '校正',
       children: Object.keys(proofreadingContent.value || {}).map((i) => ({
         key: i,
         label: i,
@@ -48,7 +48,7 @@ const items = computed<MenuProps['items']>(() => {
     {
       key: CurrentPage.FileList,
       icon: () => h(FolderOpenFilled),
-      label: '文件列表',
+      label: 'ファイル一覧',
     },
   ]
 })
@@ -75,7 +75,7 @@ const current = computed(() => {
 })
 
 const menuStyle: CSSProperties = {
-  fontFamily: 'var(--font-chinese)',
+  fontFamily: 'var(--font-japanese)',
 }
 </script>
 

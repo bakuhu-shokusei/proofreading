@@ -26,9 +26,9 @@
         >
           <div class="book-name">{{ book }}</div>
           <div class="result-count">
-            匹配结果
+            検索結果
             <b>{{ searchResult[book].length }}</b>
-            条
+            件
           </div>
 
           <Card
@@ -126,7 +126,7 @@ const goToDetail = (book: string, index: number) => {
     .results {
       border-bottom: 1px solid transparent;
       .book-result {
-        font-family: var(--font-chinese);
+        font-family: var(--font-japanese);
         margin: 32px 0;
         .book-name {
           color: var(--text-main);

@@ -51,17 +51,17 @@ const list = computed(() => {
   return books.map((book) => {
     const columns: TableProps['columns'] = [
       {
-        title: '校对状态',
+        title: '校正状態',
         dataIndex: 'completed',
         key: 'completed',
       },
       {
-        title: '图片文件',
+        title: '画像ファイル',
         dataIndex: 'image',
         key: 'image',
       },
       {
-        title: 'txt文件',
+        title: 'txtファイル',
         dataIndex: 'text',
         key: 'text',
       },
@@ -115,7 +115,7 @@ const goToDetail = (book: string, index: number) => {
         margin: 12px 0;
       }
       .table-header-cell {
-        font-family: var(--font-chinese);
+        font-family: var(--font-japanese);
       }
       .table-body-cell {
         cursor: pointer;

@@ -1,23 +1,27 @@
 <template>
   <div v-if="!browserSupported" class="error">
-    <a-alert message="需要Chrome或Edge浏览器" type="error" show-icon />
+    <a-alert
+      message="最新のChromeやEdgeを使ってください"
+      type="error"
+      show-icon
+    />
   </div>
   <div class="file-system">
     <div class="upload-drag" @click="getDirectory">
       <p class="icon">
         <inbox-outlined />
       </p>
-      <p class="info-text">点击此处选择本地文件夹</p>
+      <p class="info-text">フォルダを選択する</p>
     </div>
     <div class="info">
       <p @click="showHelp = true">
-        文件夹结构示例
+        必要なフォルダ構造
         <InfoCircleOutlined />
       </p>
       <Modal
         :open="showHelp"
         :footer="null"
-        title="文件夹结构示例"
+        title="フォルダ構造"
         wrapClassName="directory-info-wrapper"
         @cancel="showHelp = false"
       >
@@ -31,7 +35,7 @@
         class="directory-history"
         @click="getFromHistory(directoryHistory.handle)"
       >
-        之前选择的文件夹
+        前に選択したフォルダ
         <div class="previous-directory">
           <FolderOutlined class="icon" />
           {{ directoryHistory.name }}
@@ -60,26 +64,26 @@ import {
 
 const browserSupported = typeof window.showDirectoryPicker === 'function'
 const exampleDirectory = `
-目标文件夹（←选这个）
-├── 书1
-│   ├── img
-│   │   ├── 001.jpg
-│   │   └── 002.jpg
-│   ├── txt
-│   │   ├── 001.txt
-│   │   └── 002.txt
-│   └── json（可选）
-│       ├── 001.json
-│       └── 002.json
-└── 书2
-    ├── img
-    │   ├── 001.jpg
-    │   ├── 002.jpg
-    │   └── 003.jpg
-    └── txt
-        ├── 001.txt
-        ├── 002.txt
-        └── 003.txt
+input_dir
+  ├── book1
+  │   ├── img
+  │   │   ├── 001.jpg
+  │   │   └── 002.jpg
+  │   ├── txt
+  │   │   ├── 001.txt
+  │   │   └── 002.txt
+  │   └── json (任意)
+  │       ├── 001.json
+  │       └── 002.json
+  └── book2
+      ├── img
+      │   ├── 001.jpg
+      │   ├── 002.jpg
+      │   └── 003.jpg
+      └── txt
+          ├── 001.txt
+          ├── 002.txt
+          └── 003.txt
 `
 
 const showHelp = ref(false)
@@ -142,11 +146,11 @@ p {
       margin: 0 0 4px;
       color: rgba(0, 0, 0, 0.88);
       font-size: 16px;
-      font-family: var(--font-chinese);
+      font-family: var(--font-japanese);
     }
   }
   .info {
-    font-family: var(--font-chinese);
+    font-family: var(--font-japanese);
     margin: 16px auto;
     text-align: center;
     font-size: 14px;
@@ -154,7 +158,7 @@ p {
     cursor: pointer;
   }
   .directory-history {
-    font-family: var(--font-chinese);
+    font-family: var(--font-japanese);
     text-align: center;
     font-size: 14px;
     color: var(--text-main);
@@ -201,7 +205,7 @@ p {
 <style lang="scss">
 .directory-info-wrapper {
   .ant-modal-title {
-    font-family: var(--font-chinese);
+    font-family: var(--font-japanese);
   }
 }
 </style>

@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="controls">
-      <div class="controls-text">放大</div>
+      <div class="controls-text">拡大倍率</div>
       <Slider
         v-model:value="zoomLevel"
         :min="1"
@@ -36,7 +36,7 @@
         :style="{ maxWidth: '220px', flex: 1, margin: '0 16px' }"
         :tooltip-open="false"
       />
-      <div class="controls-text">{{ zoomLevel }}倍</div>
+      <div class="controls-text">{{ zoomLevel }}</div>
     </div>
   </div>
 </template>
@@ -142,7 +142,7 @@ p {
     padding: 8px 0;
     .controls-text {
       color: var(--text-main);
-      font-family: var(--font-chinese);
+      font-family: var(--font-japanese);
       font-size: 12px;
       line-height: 16px;
     }

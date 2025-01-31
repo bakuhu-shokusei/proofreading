@@ -39,4 +39,8 @@ const { currentPage } = storeToRefs(useGlobalStore())
   --primary-blue-rgb: 22, 119, 255;
   --primary-blue: rgb(22, 119, 255);
 }
+
+html {
+  font-family: var(--font-japanese);
+}
 </style>
