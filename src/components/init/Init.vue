@@ -1,50 +1,60 @@
 <template>
-  <div v-if="!browserSupported" class="error">
-    <a-alert
-      message="最新のChromeやEdgeを使ってください"
-      type="error"
-      show-icon
-    />
-  </div>
-  <div class="file-system">
-    <div class="upload-drag" @click="getDirectory">
-      <p class="icon">
-        <inbox-outlined />
-      </p>
-      <p class="info-text">フォルダを選択する</p>
+  <div class="init-page">
+    <div v-if="!browserSupported" class="error">
+      <a-alert
+        message="最新のChromeやEdgeを使ってください"
+        type="error"
+        show-icon
+      />
     </div>
-    <div class="info">
-      <p @click="showHelp = true">
-        必要なフォルダ構造
-        <InfoCircleOutlined />
-      </p>
-      <Modal
-        :open="showHelp"
-        :footer="null"
-        title="フォルダ構造"
-        wrapClassName="directory-info-wrapper"
-        @cancel="showHelp = false"
-      >
-        <div class="directory-example">{{ exampleDirectory.trim() }}</div>
-      </Modal>
+    <div class="file-system">
+      <div class="upload-drag" @click="getDirectory">
+        <p class="icon">
+          <inbox-outlined />
+        </p>
+        <p class="info-text">フォルダを選択する</p>
+      </div>
+      <div class="info">
+        <p @click="showHelp = true">
+          必要なフォルダ構造
+          <InfoCircleOutlined />
+        </p>
+        <Modal
+          :open="showHelp"
+          :footer="null"
+          title="フォルダ構造"
+          wrapClassName="directory-info-wrapper"
+          @cancel="showHelp = false"
+        >
+          <div class="directory-example">{{ exampleDirectory.trim() }}</div>
+        </Modal>
+      </div>
+
+      <template v-if="directoryHistory">
+        <Divider :style="{ fontSize: '12px' }">OR</Divider>
+        <div
+          class="directory-history"
+          @click="getFromHistory(directoryHistory.handle)"
+        >
+          前に選択したフォルダ
+          <div class="previous-directory">
+            <FolderOutlined class="icon" />
+            {{ directoryHistory.name }}
+          </div>
+        </div>
+      </template>
     </div>
 
-    <template v-if="directoryHistory">
-      <Divider :style="{ fontSize: '12px' }">OR</Divider>
-      <div
-        class="directory-history"
-        @click="getFromHistory(directoryHistory.handle)"
-      >
-        前に選択したフォルダ
-        <div class="previous-directory">
-          <FolderOutlined class="icon" />
-          {{ directoryHistory.name }}
-        </div>
-      </div>
-    </template>
-  </div>
-  <div v-if="browserSupported && directoryHistory === undefined" class="spin">
-    <a-spin size="large" />
+    <div class="github-link">
+      <a href="https://github.com/bakuhu-shokusei/proofreading" target="_blank">
+        Github
+        <img src="/github-mark.svg" />
+      </a>
+    </div>
+
+    <div v-if="browserSupported && directoryHistory === undefined" class="spin">
+      <a-spin size="large" />
+    </div>
   </div>
 </template>
 
@@ -120,13 +130,21 @@ p {
 .error {
   padding: 16px;
 }
+
+.init-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 .file-system {
+  flex: 1;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
   align-items: center;
   justify-content: center;
-  height: 100dvh;
   max-width: 800px;
   margin: 0 auto;
   .upload-drag {
@@ -179,6 +197,23 @@ p {
         margin-right: 8px;
         color: var(--primary-blue);
       }
+    }
+  }
+}
+
+.github-link {
+  height: 32px;
+  & > a {
+    font-size: 14px;
+    text-decoration: none;
+    color: #666f78;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    & > img {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
     }
   }
 }
