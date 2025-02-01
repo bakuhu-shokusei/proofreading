@@ -1,5 +1,5 @@
 <template>
-  <div class="init-page">
+  <div v-show="directoryHistory !== undefined" class="init-page">
     <div v-if="!browserSupported" class="error">
       <a-alert
         message="最新のChromeやEdgeを使ってください"
@@ -51,11 +51,12 @@
         <img src="/github-mark.svg" />
       </a>
     </div>
-
+  </div>
+  <Transition>
     <div v-if="browserSupported && directoryHistory === undefined" class="spin">
       <a-spin size="large" />
     </div>
-  </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -234,6 +235,19 @@ p {
   align-items: center;
   justify-content: center;
   height: 100dvh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.1);
+  &.v-enter-active,
+  &.v-leave-active {
+    transition: background 0.3s ease;
+  }
+  &.v-enter-from,
+  &.v-leave-to {
+    background: rgba(0, 0, 0, 0);
+  }
 }
 </style>
 
