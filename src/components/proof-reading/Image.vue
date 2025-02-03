@@ -97,16 +97,31 @@ const mouseDown = (e: MouseEvent) => {
   if (!container) return
   const [scrollLeft, scrollTop] = [container.scrollLeft, container.scrollTop]
   const [prevX, prevY] = [e.clientX, e.clientY]
+  /*
+   * if it's a drag action(true): do not select
+   * if it's a click action(false): select
+   */
+  let moved = false
   function onMove(e: MouseEvent) {
     const [clientX, clientY] = [e.clientX, e.clientY]
     const deltaX = clientX - prevX
     const deltaY = clientY - prevY
     container.scrollLeft = scrollLeft - deltaX
     container.scrollTop = scrollTop - deltaY
+
+    if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) moved = true
+  }
+  function cancelClick(e: MouseEvent) {
+    e.stopPropagation()
+    document.removeEventListener('click', cancelClick, true)
   }
   function onEnd() {
     document.removeEventListener('mousemove', onMove)
     document.removeEventListener('mouseup', onEnd)
+    if (moved) {
+      // prevent triggering click event
+      document.addEventListener('click', cancelClick, true)
+    }
   }
   document.addEventListener('mousemove', onMove)
   document.addEventListener('mouseup', onEnd)
