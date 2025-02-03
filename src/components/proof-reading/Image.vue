@@ -133,7 +133,7 @@ watch(
     if (typeof index !== 'number') return
     const selected = imgContainer.value?.querySelectorAll('.layout-box')[index]
     if (selected instanceof Element) {
-      selected.scrollIntoView({ behavior: 'smooth' })
+      selected.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   },
 )
